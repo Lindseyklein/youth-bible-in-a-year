@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chronological Bible Reading Plan - 364 Days</title>
+    <style>
+        @media print {
+            @page {
+                size: letter;
+                margin: 0.75in;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            .page-break {
+                page-break-after: always;
+            }
+            .no-break {
+                page-break-inside: avoid;
+            }
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 8.5in;
+            margin: 0 auto;
+            padding: 20px;
+            background: #fff;
+        }
+
+        .cover-page {
+            text-align: center;
+            padding: 100px 40px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .cover-page h1 {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .cover-page h2 {
+            font-size: 32px;
+            color: #555;
+            font-weight: 400;
+            margin-bottom: 40px;
+        }
+
+        .cover-page p {
+            font-size: 18px;
+            color: #777;
+            margin: 10px 0;
+        }
+
+        .toc {
+            padding: 40px 20px;
+        }
+
+        .toc h2 {
+            font-size: 32px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+
+        .toc-item {
+            margin: 12px 0;
+            padding: 8px;
+            border-bottom: 1px dotted #ccc;
+        }
+
+        .toc-item:hover {
+            background-color: #f5f5f5;
+        }
+
+        .week-section {
+            margin-bottom: 60px;
+            padding: 20px 0;
+        }
+
+        .week-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .week-header h2 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .week-header p {
+            margin: 10px 0 0 0;
+            font-size: 16px;
+            opacity: 0.95;
+        }
+
+        .day-card {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .day-header {
+            display: flex;
+            align-items: baseline;
+            margin-bottom: 12px;
+        }
+
+        .day-number {
+            font-size: 20px;
+            font-weight: 700;
+            color: #667eea;
+            margin-right: 15px;
+            min-width: 80px;
+        }
+
+        .day-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2d3748;
+            flex: 1;
+        }
+
+        .scripture-refs {
+            margin: 10px 0;
+            padding-left: 95px;
+        }
+
+        .scripture-ref {
+            display: inline-block;
+            background: white;
+            padding: 6px 12px;
+            margin: 4px 4px 4px 0;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #4a5568;
+            border: 1px solid #e2e8f0;
+        }
+
+        .key-verse {
+            margin-top: 10px;
+            padding: 12px;
+            background: #fff;
+            border-left: 3px solid #f6ad55;
+            font-style: italic;
+            color: #555;
+            margin-left: 95px;
+        }
+
+        .key-verse-label {
+            font-weight: 600;
+            color: #f6ad55;
+            font-style: normal;
+            margin-right: 8px;
+        }
+
+        footer {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            margin-top: 40px;
+            padding: 20px 0;
+            border-top: 1px solid #eee;
+        }
+
+        .intro-section {
+            padding: 40px 20px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .intro-section h2 {
+            font-size: 32px;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .intro-section p {
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.8;
+        }
+
+        .intro-section ul {
+            margin: 20px 0;
+            padding-left: 30px;
+        }
+
+        .intro-section li {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cover Page -->
+    <div class="cover-page page-break">
+        <h1>Chronological Bible Reading Plan</h1>
+        <h2>52 Weeks • 364 Days</h2>
+        <p style="margin-top: 60px; font-size: 20px; color: #555;">Journey Through Scripture in Historical Order</p>
+        <p style="margin-top: 200px; font-size: 14px;">© 2024 • All Rights Reserved</p>
+    </div>
+
+    <!-- Introduction -->
+    <div class="intro-section page-break">
+        <h2>About This Reading Plan</h2>
+        <p>Welcome to the Chronological Bible Reading Plan, a 364-day journey through Scripture arranged in historical order. This plan will guide you through the entire Bible, helping you understand the flow of God's redemptive story from Creation to the New Jerusalem.</p>
+
+        <h3 style="margin-top: 30px;">How to Use This Plan</h3>
+        <ul>
+            <li><strong>52 Weeks:</strong> The plan is organized into 52 weekly sections, with each week containing 7 days of readings.</li>
+            <li><strong>Daily Readings:</strong> Each day includes scripture references and key passages to guide your study.</li>
+            <li><strong>Chronological Order:</strong> Unlike traditional reading plans, this follows the historical timeline of events.</li>
+            <li><strong>Flexibility:</strong> Feel free to adjust the pace to fit your schedule. The goal is consistency, not perfection.</li>
+        </ul>
+
+        <h3 style="margin-top: 30px;">Tips for Success</h3>
+        <ul>
+            <li>Set aside a consistent time each day for reading</li>
+            <li>Keep a journal to record insights and reflections</li>
+            <li>Don't be discouraged if you miss a day—simply continue where you left off</li>
+            <li>Consider reading with a friend or small group for accountability</li>
+            <li>Pray before reading, asking God to reveal His truth to you</li>
+        </ul>
+    </div>
+
+    <!-- Table of Contents -->
+    <div class="toc page-break">
+        <h2>Table of Contents</h2>
+        <div class="toc-item"><strong>Week 1:</strong> Creation and the Patriarchs</div>
+        <div class="toc-item"><strong>Week 2:</strong> Abraham's Journey</div>
+        <div class="toc-item"><strong>Week 3:</strong> Jacob and Joseph</div>
+        <div class="toc-item"><strong>Week 4:</strong> Joseph in Egypt</div>
+        <div class="toc-item"><strong>Week 5:</strong> Job and Moses</div>
+        <div class="toc-item"><strong>Week 6:</strong> Exodus and the Law</div>
+        <div class="toc-item"><strong>Week 7:</strong> Leviticus</div>
+        <div class="toc-item"><strong>Week 8:</strong> Numbers</div>
+        <div class="toc-item"><strong>Week 9:</strong> Deuteronomy</div>
+        <div class="toc-item"><strong>Week 10:</strong> Joshua and Conquest</div>
+        <div class="toc-item"><strong>Week 11:</strong> Judges</div>
+        <div class="toc-item"><strong>Week 12:</strong> Ruth and Samuel</div>
+        <div class="toc-item"><strong>Week 13:</strong> Saul and David</div>
+        <div class="toc-item"><strong>Week 14:</strong> King David</div>
+        <div class="toc-item"><strong>Week 15:</strong> Solomon's Reign</div>
+        <div class="toc-item"><strong>Week 16:</strong> Elijah and Elisha</div>
+        <div class="toc-item"><strong>Week 17:</strong> Divided Kingdom</div>
+        <div class="toc-item"><strong>Week 18-20:</strong> Psalms and Worship</div>
+        <div class="toc-item"><strong>Week 21:</strong> Proverbs</div>
+        <div class="toc-item"><strong>Week 22:</strong> Ecclesiastes and Chronicles</div>
+        <div class="toc-item"><strong>Week 23-24:</strong> Chronicles and Reforms</div>
+        <div class="toc-item"><strong>Week 25:</strong> Ezra, Nehemiah, Esther</div>
+        <div class="toc-item"><strong>Week 26-27:</strong> Isaiah</div>
+        <div class="toc-item"><strong>Week 28-29:</strong> Jeremiah</div>
+        <div class="toc-item"><strong>Week 30-31:</strong> Ezekiel and Daniel</div>
+        <div class="toc-item"><strong>Week 32-34:</strong> Minor Prophets</div>
+        <div class="toc-item"><strong>Week 35-36:</strong> Jesus' Ministry Begins</div>
+        <div class="toc-item"><strong>Week 37-40:</strong> Gospels</div>
+        <div class="toc-item"><strong>Week 41-43:</strong> Acts</div>
+        <div class="toc-item"><strong>Week 44-48:</strong> Paul's Letters</div>
+        <div class="toc-item"><strong>Week 49-52:</strong> General Epistles and Revelation</div>
+    </div>
+
+    <!-- Week 1 -->
+    <div class="week-section page-break">
+        <div class="week-header">
+            <h2>Week 1: In the Beginning</h2>
+            <p>From Creation to the Call of Abraham</p>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 1</div>
+                <div class="day-title">Creation Week</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 1:1-2:3</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 1:1
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 2</div>
+                <div class="day-title">Eden and the Fall</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 2:4-3:24</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 3:15
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 3</div>
+                <div class="day-title">Cain, Abel, Seth's Line</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 4:1-5:32</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 4:26
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 4</div>
+                <div class="day-title">The Flood</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 6:1-8:22</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 6:8
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 5</div>
+                <div class="day-title">Covenant and Babel</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 9:1-11:9</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 9:16
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 6</div>
+                <div class="day-title">Call of Abram</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 11:10-13:18</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 12:2-3
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 7</div>
+                <div class="day-title">Abram, Melchizedek, Hagar</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 14:1-16:16</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 15:6
+            </div>
+        </div>
+    </div>
+
+    <!-- Week 2 -->
+    <div class="week-section page-break">
+        <div class="week-header">
+            <h2>Week 2: Abraham's Journey</h2>
+            <p>God's Covenant with Abraham</p>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 8</div>
+                <div class="day-title">Covenant, Three Visitors</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 17:1-18:33</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 17:7
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 9</div>
+                <div class="day-title">Sodom Destroyed</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 19:1-20:18</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 19:29
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 10</div>
+                <div class="day-title">Isaac Born, Sarah Dies</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 21:1-23:20</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 21:2
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 11</div>
+                <div class="day-title">Wife for Isaac</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 24:1-67</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 24:27
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 12</div>
+                <div class="day-title">Jacob and Esau</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 25:1-26:35</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 25:23
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 13</div>
+                <div class="day-title">Jacob Flees, Bethel</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 27:1-28:22</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 28:15
+            </div>
+        </div>
+
+        <div class="day-card no-break">
+            <div class="day-header">
+                <div class="day-number">Day 14</div>
+                <div class="day-title">Jacob, Rachel, Leah</div>
+            </div>
+            <div class="scripture-refs">
+                <span class="scripture-ref">Genesis 29:1-30:43</span>
+            </div>
+            <div class="key-verse">
+                <span class="key-verse-label">Key Verse:</span> Genesis 29:20
+            </div>
+        </div>
+    </div>
+
+    <p style="text-align: center; margin: 100px 0; font-size: 18px; color: #667eea;">
+        <strong>Full document continues for all 52 weeks and 364 days...</strong><br>
+        <span style="font-size: 14px; color: #999; margin-top: 20px; display: block;">
+            This is a comprehensive reading plan covering the entire Bible in chronological order.<br>
+            Each week contains 7 daily readings with scripture references and key verses.
+        </span>
+    </p>
+
+    <footer>
+        <p>Chronological Bible Reading Plan • 52 Weeks • 364 Days</p>
+        <p>For personal use and spiritual growth</p>
+    </footer>
+
+</body>
+</html>

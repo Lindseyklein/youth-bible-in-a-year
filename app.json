@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "Youth Bible In A Year",
+    "slug": "youth-bible-in-a-year",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "scheme": "myapp",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yourcompany.bibleinayear",
+      "infoPlist": {
+        "NSContactsUsageDescription": "This app needs access to your contacts to help you invite friends to join your Bible reading journey."
+      }
+    },
+    "android": {
+      "package": "com.youthbibleinayearllc.youthbibleinayear",
+      "permissions": [
+        "READ_CONTACTS"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/images/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      "expo-web-browser",
+      "expo-notifications"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "aba39228-f816-4b61-837b-7977bb277041"
+      }
+    }
+  }
+}
