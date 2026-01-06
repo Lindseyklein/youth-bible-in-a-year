@@ -15,9 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.yourcompany.bibleinayear",
+      "bundleIdentifier": "com.youthbibleinayearllc.youthbibleinayear",
       "infoPlist": {
-        "NSContactsUsageDescription": "This app needs access to your contacts to help you invite friends to join your Bible reading journey."
+        "NSContactsUsageDescription": "This app needs access to your contacts to help you invite friends to join your Bible reading journey.",
+        "ITSAppUsesNonExemptEncryption": false
       }
     },
     "android": {
@@ -45,6 +46,8 @@
       "eas": {
         "projectId": "aba39228-f816-4b61-837b-7977bb277041"
       }
-    }
+    },
+    "owner": "youthbible365"
   }
 }
+
