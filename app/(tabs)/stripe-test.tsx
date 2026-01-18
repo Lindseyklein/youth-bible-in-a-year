@@ -17,125 +17,32 @@ export default function StripeTestScreen() {
     }
   }, [user]);
 
-  const testPriceId = process.env.EXPO_PUBLIC_STRIPE_PRICE_ID || 'price_1234567890';
-
   const loadStripeData = async () => {
-    if (!user) return;
-
-    try {
-      const { data: subscription } = await supabase
-        .from('stripe_user_subscriptions')
-        .select('*')
-        .maybeSingle();
-
-      const { data: orders } = await supabase
-        .from('stripe_user_orders')
-        .select('*')
-        .order('order_date', { ascending: false });
-
-      setSubscriptionData(subscription);
-      setOrderData(orders || []);
-    } catch (error) {
-      console.error('Error loading Stripe data:', error);
-    }
+    // Stripe data loading removed - IAP not wired yet
+    setSubscriptionData(null);
+    setOrderData([]);
   };
 
   const handleSubscriptionCheckout = async () => {
-    if (!user) {
-      Alert.alert('Error', 'Please sign in first');
-      return;
-    }
-
     setLoading(true);
-    try {
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
-
-      if (!token) {
-        Alert.alert('Error', 'No auth token found');
-        return;
-      }
-
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/stripe-checkout`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            price_id: testPriceId,
-            mode: 'subscription',
-            success_url: 'http://localhost:8081/stripe-test?success=true',
-            cancel_url: 'http://localhost:8081/stripe-test?canceled=true',
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok && data.url) {
-        Alert.alert('Success', `Checkout URL created: ${data.url.substring(0, 50)}...`);
-        console.log('Full checkout URL:', data.url);
-      } else {
-        Alert.alert('Error', data.error || 'Failed to create checkout session');
-      }
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to create checkout');
-      console.error('Checkout error:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Temporary stub for IAP purchase
+    const startPurchase = () => {
+      console.log('IAP not wired yet');
+    };
+    startPurchase();
+    Alert.alert('Info', 'IAP not wired yet');
+    setLoading(false);
   };
 
   const handleOneTimePayment = async () => {
-    if (!user) {
-      Alert.alert('Error', 'Please sign in first');
-      return;
-    }
-
     setLoading(true);
-    try {
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
-
-      if (!token) {
-        Alert.alert('Error', 'No auth token found');
-        return;
-      }
-
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/stripe-checkout`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            price_id: testPriceId,
-            mode: 'payment',
-            success_url: 'http://localhost:8081/stripe-test?success=true',
-            cancel_url: 'http://localhost:8081/stripe-test?canceled=true',
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok && data.url) {
-        Alert.alert('Success', `Checkout URL created: ${data.url.substring(0, 50)}...`);
-        console.log('Full checkout URL:', data.url);
-      } else {
-        Alert.alert('Error', data.error || 'Failed to create checkout session');
-      }
-    } catch (error: any) {
-      Alert.alert('Error', error.message || 'Failed to create checkout');
-      console.error('Checkout error:', error);
-    } finally {
-      setLoading(false);
-    }
+    // Temporary stub for IAP purchase
+    const startPurchase = () => {
+      console.log('IAP not wired yet');
+    };
+    startPurchase();
+    Alert.alert('Info', 'IAP not wired yet');
+    setLoading(false);
   };
 
   return (
@@ -234,10 +141,8 @@ export default function StripeTestScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Setup Instructions</Text>
           <View style={styles.infoCard}>
-            <Text style={styles.infoText}>1. Set STRIPE_SECRET_KEY in Supabase edge function secrets</Text>
-            <Text style={styles.infoText}>2. Set STRIPE_WEBHOOK_SECRET for webhook endpoint</Text>
-            <Text style={styles.infoText}>3. Update testPriceId with your Stripe Price ID</Text>
-            <Text style={styles.infoText}>4. Configure webhook URL in Stripe Dashboard</Text>
+            <Text style={styles.infoText}>IAP integration not yet implemented</Text>
+            <Text style={styles.infoText}>Stripe has been removed from the codebase</Text>
           </View>
         </View>
       </View>

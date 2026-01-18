@@ -127,45 +127,14 @@ export default function SignUp() {
       return;
     }
 
-    try {
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
+    // Temporary stub for IAP purchase
+    const startPurchase = () => {
+      console.log('IAP not wired yet');
+    };
 
-      if (!token) {
-        throw new Error('No authentication token found');
-      }
-
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/stripe-checkout`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            price_id: process.env.EXPO_PUBLIC_STRIPE_PRICE_ID,
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok && data.url) {
-        if (Platform.OS === 'web') {
-          window.location.href = data.url;
-        } else {
-          const { WebBrowser } = await import('expo-web-browser');
-          await WebBrowser.openBrowserAsync(data.url);
-        }
-      } else {
-        throw new Error(data.error || 'Failed to create checkout session');
-      }
-    } catch (checkoutError: any) {
-      console.error('Checkout error:', checkoutError);
-      setError(`Payment setup failed: ${checkoutError.message}`);
-      setIsLoading(false);
-    }
+    startPurchase();
+    setIsLoading(false);
+    router.replace('/(tabs)');
   };
 
   return (

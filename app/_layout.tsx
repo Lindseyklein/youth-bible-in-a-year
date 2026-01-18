@@ -4,6 +4,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useFrameworkReady } from '@/hooks/useFrameworkReady';
 import { AuthProvider, useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
+import { configurePurchases } from '@/lib/purchases';
 
 function RootLayoutNav() {
   const { session, loading } = useAuth();
@@ -27,50 +28,32 @@ function RootLayoutNav() {
     if (!session?.user) return;
 
     try {
-      const { data: stripeSubscription } = await supabase
-        .from('stripe_user_subscriptions')
-        .select('subscription_status')
-        .eq('user_id', session.user.id)
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('requires_parental_consent, parental_consent_obtained, subscription_status, subscription_ends_at')
+        .eq('id', session.user.id)
         .maybeSingle();
 
-      let hasSubscription = false;
+      if (profile) {
+        const needsConsent = profile.requires_parental_consent && !profile.parental_consent_obtained;
+        setRequiresConsent(needsConsent);
 
-      if (stripeSubscription) {
-        const status = stripeSubscription.subscription_status;
-        hasSubscription = status === 'active' || status === 'trialing';
-      } else {
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('requires_parental_consent, parental_consent_obtained, subscription_status, subscription_ends_at')
-          .eq('id', session.user.id)
-          .maybeSingle();
+        // Check profile subscription status (IAP not wired yet, so allow access)
+        const subscriptionStatus = profile.subscription_status || 'none';
+        const hasSubscription = subscriptionStatus === 'trial' || subscriptionStatus === 'active';
 
-        if (profile) {
-          const needsConsent = profile.requires_parental_consent && !profile.parental_consent_obtained;
-          setRequiresConsent(needsConsent);
-
-          const subscriptionStatus = profile.subscription_status || 'none';
-          hasSubscription = subscriptionStatus === 'trial' || subscriptionStatus === 'active';
-
-          if (profile.subscription_ends_at && subscriptionStatus === 'active') {
-            const endsAt = new Date(profile.subscription_ends_at);
-            if (endsAt < new Date()) {
-              hasSubscription = false;
-            }
+        if (profile.subscription_ends_at && subscriptionStatus === 'active') {
+          const endsAt = new Date(profile.subscription_ends_at);
+          if (endsAt >= new Date()) {
+            setHasActiveSubscription(true);
+          } else {
+            setHasActiveSubscription(false);
           }
+        } else {
+          // For now, allow access without blocking on subscription (IAP stub)
+          setHasActiveSubscription(hasSubscription);
         }
       }
-
-      if (!hasSubscription && retryCount < 3) {
-        setTimeout(() => checkProfile(retryCount + 1), 2000);
-        if (retryCount === 0) {
-          setHasActiveSubscription(false);
-          setProfileChecked(true);
-        }
-        return;
-      }
-
-      setHasActiveSubscription(hasSubscription);
     } catch (err) {
       console.error('Error checking profile:', err);
     } finally {
@@ -102,9 +85,9 @@ function RootLayoutNav() {
 
     if (!session && inTabsGroup) {
       router.replace('/');
-    } else if (session && !requiresConsent && hasActiveSubscription && segments.length === 0) {
+    } else if (session && !requiresConsent && segments.length === 0) {
       router.replace('/(tabs)');
-    } else if (session && !requiresConsent && hasActiveSubscription && inAuthGroup && !isPendingConsent) {
+    } else if (session && !requiresConsent && inAuthGroup && !isPendingConsent) {
       router.replace('/(tabs)');
     }
   }, [session, loading, segments, profileChecked, requiresConsent, hasActiveSubscription]);
@@ -124,11 +107,56 @@ function RootLayoutNav() {
   );
 }
 
+function RevenueCatInitializer() {
+  const { session, loading } = useAuth();
+  const [configured, setConfigured] = useState(false);
+
+  useEffect(() => {
+    // Only configure once on mount, don't block rendering
+    if (configured) return;
+
+    // Configure RevenueCat asynchronously without blocking
+    const initRevenueCat = async () => {
+      try {
+        // If user is logged in, use their user ID; otherwise configure anonymously
+        const userId = session?.user?.id;
+        await configurePurchases(userId);
+        setConfigured(true);
+      } catch (error) {
+        // Log error but don't block app rendering
+        console.error('Failed to configure RevenueCat on app boot:', error);
+        // Still mark as configured to avoid retrying repeatedly
+        setConfigured(true);
+      }
+    };
+
+    // Don't wait for auth to finish loading - configure anonymously first if needed
+    if (!loading) {
+      initRevenueCat();
+    }
+  }, [session, loading, configured]);
+
+  // Re-configure when session changes (user logs in/out)
+  useEffect(() => {
+    if (configured && !loading) {
+      const userId = session?.user?.id;
+      // Re-configure with user ID if logged in, or update to anonymous if logged out
+      configurePurchases(userId).catch((error) => {
+        console.error('Failed to re-configure RevenueCat after auth change:', error);
+      });
+    }
+  }, [session?.user?.id, configured, loading]);
+
+  // This component doesn't render anything
+  return null;
+}
+
 export default function RootLayout() {
   useFrameworkReady();
 
   return (
     <AuthProvider>
+      <RevenueCatInitializer />
       <RootLayoutNav />
       <StatusBar style="auto" />
     </AuthProvider>

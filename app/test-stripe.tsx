@@ -9,11 +9,8 @@ export default function TestStripeScreen() {
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string>('');
 
-  const STRIPE_PRICE_ID = process.env.EXPO_PUBLIC_STRIPE_PRICE_ID || 'price_1234567890';
-
   const testConfiguration = () => {
     const config = {
-      priceId: STRIPE_PRICE_ID,
       supabaseUrl: process.env.EXPO_PUBLIC_SUPABASE_URL,
       hasUser: !!user,
       userEmail: user?.email,
@@ -23,80 +20,28 @@ export default function TestStripeScreen() {
   };
 
   const testCheckoutCreation = async () => {
-    if (!user) {
-      setError('Not logged in');
-      return;
-    }
-
     setLoading(true);
     setError('');
     setResult(null);
 
-    try {
-      const session = await supabase.auth.getSession();
-      const token = session.data.session?.access_token;
+    // Temporary stub for IAP purchase
+    const startPurchase = () => {
+      console.log('IAP not wired yet');
+    };
 
-      if (!token) {
-        throw new Error('No auth token');
-      }
-
-      const response = await fetch(
-        `${process.env.EXPO_PUBLIC_SUPABASE_URL}/functions/v1/stripe-checkout`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            price_id: STRIPE_PRICE_ID,
-            mode: 'subscription',
-            success_url: 'http://localhost:8081/test-stripe?success=true',
-            cancel_url: 'http://localhost:8081/test-stripe?canceled=true',
-          }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setResult({ type: 'success', data });
-      } else {
-        setError(`Error ${response.status}: ${JSON.stringify(data)}`);
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    startPurchase();
+    setResult({ type: 'success', data: { message: 'IAP not wired yet' } });
+    setLoading(false);
   };
 
   const testSubscriptionQuery = async () => {
-    if (!user) {
-      setError('Not logged in');
-      return;
-    }
-
     setLoading(true);
     setError('');
     setResult(null);
 
-    try {
-      const { data, error: queryError } = await supabase
-        .from('stripe_user_subscriptions')
-        .select('*')
-        .maybeSingle();
-
-      if (queryError) {
-        setError(`Query error: ${queryError.message}`);
-      } else {
-        setResult({ type: 'subscription', data: data || 'No subscription found' });
-      }
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    // Stripe subscription query removed - IAP not wired yet
+    setResult({ type: 'subscription', data: 'IAP not wired yet' });
+    setLoading(false);
   };
 
   return (
