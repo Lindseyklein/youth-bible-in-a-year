@@ -9,16 +9,10 @@ type ShareGroupCardProps = {
   joinCode: string;
 };
 
-const APP_SCHEME = 'myapp';
-const APP_URL = 'https://yourbibleinayear.app';
-
 export default function ShareGroupCard({ groupId, groupName, joinCode }: ShareGroupCardProps) {
   const [copied, setCopied] = useState(false);
 
-  const inviteLink = `${APP_SCHEME}://join?code=${encodeURIComponent(joinCode)}`;
-  const universalLink = `${APP_URL}/join?code=${encodeURIComponent(joinCode)}`;
-
-  const shareMessage = `Join my Bible study group "${groupName}" on Youth Bible In A Year!\n\nJoin code: ${joinCode}\n\n${universalLink}`;
+  const shareMessage = `Join my Bible study group "${groupName}" on Youth Bible In A Year!\n\nJoin code: ${(joinCode || '').toUpperCase()}\n\nEnter this code in the Groups tab to join. No link or email required.`;
 
   const handleCopyCode = async () => {
     await Clipboard.setStringAsync(joinCode.toUpperCase());
@@ -31,7 +25,6 @@ export default function ShareGroupCard({ groupId, groupName, joinCode }: ShareGr
       await Share.share({
         message: shareMessage,
         title: `Join ${groupName}`,
-        url: universalLink,
       });
     } catch (err) {
       console.error('Share error:', err);

@@ -123,7 +123,7 @@ export default function Groups() {
           </View>
           <View style={styles.createContent}>
             <Text style={styles.createTitle}>Create Group</Text>
-            <Text style={styles.createText}>Start a new Bible study group</Text>
+            <Text style={styles.createText}>Start your own group—youth and leaders can create one</Text>
           </View>
           <ChevronRight size={22} color="#fff" />
         </TouchableOpacity>

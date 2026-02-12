@@ -7,6 +7,7 @@ import { ArrowLeft, Settings, MessageCircle, BookOpen, Users, Heart, Target, Bel
 import { LinearGradient } from 'expo-linear-gradient';
 import DiscussionHistory from '@/components/DiscussionHistory';
 import GroupMembersList from '@/components/GroupMembersList';
+import ShareGroupCard from '@/app/groups/[id]/ShareGroupCard';
 import { toDisplayString } from '@/lib/displayUtils';
 
 type Group = {
@@ -16,6 +17,7 @@ type Group = {
   current_week: number;
   leader_id: string;
   member_count: number;
+  invite_code?: string;
 };
 
 type Discussion = {
@@ -530,6 +532,15 @@ export default function GroupDetail() {
       {activeTab === 'more' && (
         <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
           <View style={styles.section}>
+            {isLeader && group.invite_code ? (
+              <View style={styles.sectionBlock}>
+                <ShareGroupCard
+                  groupId={group.id}
+                  groupName={toDisplayString(group.name)}
+                  joinCode={group.invite_code}
+                />
+              </View>
+            ) : null}
             <Text style={styles.sectionTitle}>This Week's Challenge</Text>
 
             {weeklyChallenge ? (
@@ -813,6 +824,9 @@ const styles = StyleSheet.create({
   },
   section: {
     padding: 16,
+  },
+  sectionBlock: {
+    marginBottom: 24,
   },
   sectionTitle: {
     fontSize: 20,

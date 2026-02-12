@@ -2,14 +2,13 @@ import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator, Switch, Platform, TextInput, Modal, Linking, Alert } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { LogOut, Award, Calendar, Users, RefreshCw, History, Crown, CheckCircle, UserPlus, Shield, Bell, Mail, Phone, HelpCircle, AlertCircle, FileText, Info, ExternalLink, Trash2, Lock, ChevronRight } from 'lucide-react-native';
+import { LogOut, Award, Calendar, Users, RefreshCw, History, Crown, CheckCircle, Shield, Bell, Mail, Phone, HelpCircle, AlertCircle, FileText, Info, ExternalLink, Trash2, Lock, ChevronRight } from 'lucide-react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import Constants from 'expo-constants';
 import * as WebBrowser from 'expo-web-browser';
 import RestartPlanDialog from '@/components/RestartPlanDialog';
 import PlanHistoryView from '@/components/PlanHistoryView';
-import InviteMembersModal from '@/components/InviteMembersModal';
 import AdminConsentView from '@/components/AdminConsentView';
 import { scheduleDailyReminder, cancelDailyReminder, requestNotificationPermissions } from '@/lib/notifications';
 
@@ -40,7 +39,6 @@ export default function Profile() {
   const [loading, setLoading] = useState(true);
   const [showRestartDialog, setShowRestartDialog] = useState(false);
   const [showHistory, setShowHistory] = useState(false);
-  const [showInviteModal, setShowInviteModal] = useState(false);
   const [showAdminConsent, setShowAdminConsent] = useState(false);
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [reminderTime, setReminderTime] = useState('09:00:00');
@@ -325,25 +323,6 @@ export default function Profile() {
           )}
         </View>
       </View>
-
-      {profile?.user_role === 'leader' && (
-        <View style={styles.inviteSection}>
-          <TouchableOpacity
-            style={styles.inviteButton}
-            onPress={() => setShowInviteModal(true)}
-          >
-            <LinearGradient
-              colors={['#2563EB', '#0EA5E9']}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 0 }}
-              style={styles.inviteButtonGradient}
-            >
-              <UserPlus size={20} color="#fff" />
-              <Text style={styles.inviteButtonText}>Invite Youth Members</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-        </View>
-      )}
 
       {profile?.user_role === 'leader' && (
         <View style={styles.section}>
@@ -728,11 +707,6 @@ export default function Profile() {
         onSuccess={handleRestartSuccess}
       />
 
-      <InviteMembersModal
-        visible={showInviteModal}
-        onClose={() => setShowInviteModal(false)}
-      />
-
       <Modal visible={showPasswordModal} transparent animationType="fade">
         <View style={styles.modalOverlay}>
           <View style={styles.modalContent}>
@@ -947,27 +921,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '600',
     color: '#666',
-  },
-  inviteSection: {
-    paddingHorizontal: 16,
-    paddingTop: 8,
-    paddingBottom: 8,
-  },
-  inviteButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
-  },
-  inviteButtonGradient: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 14,
-    gap: 8,
-  },
-  inviteButtonText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '600',
   },
   statsContainer: {
     flexDirection: 'row',
