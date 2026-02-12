@@ -2,10 +2,10 @@ import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
-import { Users, Plus, MessageCircle, Settings, ChevronRight } from 'lucide-react-native';
+import { Users, Plus, MessageCircle, ChevronRight, Hash } from 'lucide-react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { router } from 'expo-router';
-import FriendInviteButton from '@/components/FriendInviteButton';
+import JoinGroupByCodeModal from '@/components/JoinGroupByCodeModal';
 
 type Group = {
   id: string;
@@ -21,126 +21,59 @@ type Group = {
 export default function Groups() {
   const { user } = useAuth();
   const [myGroups, setMyGroups] = useState<Group[]>([]);
-  const [publicGroups, setPublicGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
+  const [showJoinModal, setShowJoinModal] = useState(false);
 
   useEffect(() => {
     loadGroups();
   }, [user]);
 
   const loadGroups = async () => {
-    if (!user) {
-      console.log('No user found');
-      return;
-    }
+    if (!user) return;
 
-    console.log('Loading groups for user:', user.id);
     setLoading(true);
 
     try {
-      const { data: memberships, error: membershipError } = await supabase
+      const { data: memberships, error } = await supabase
         .from('group_members')
         .select('group_id, role, groups(*)')
         .eq('user_id', user.id)
         .eq('status', 'active');
 
-      console.log('User memberships:', memberships, 'Error:', membershipError);
-
-      if (membershipError) {
-        console.error('Error loading memberships:', membershipError);
+      if (error) {
         setMyGroups([]);
       } else if (memberships && memberships.length > 0) {
         const groupsWithDetails = await Promise.all(
-          memberships.map(async (membership: any) => {
-            const group = membership.groups;
-            if (!group) return null;
-
+          memberships.map(async (m: any) => {
+            const g = m.groups;
+            if (!g) return null;
             const { count } = await supabase
               .from('group_members')
               .select('*', { count: 'exact', head: true })
-              .eq('group_id', group.id)
+              .eq('group_id', g.id)
               .eq('status', 'active');
-
-            return {
-              ...group,
-              role: membership.role,
-              member_count: count || 1,
-              unread_count: 0,
-            };
+            return { ...g, role: m.role, member_count: count || 1, unread_count: 0 };
           })
         );
-
-        const validGroups = groupsWithDetails.filter(g => g !== null);
-        console.log('Final groups with details:', validGroups);
-        setMyGroups(validGroups);
+        setMyGroups(groupsWithDetails.filter(Boolean));
       } else {
-        console.log('No group memberships found');
         setMyGroups([]);
       }
-    } catch (error) {
-      console.error('Error in loadGroups:', error);
+    } catch {
       setMyGroups([]);
-    }
-
-    try {
-      const { data: publicGroupsData, error: publicError } = await supabase
-        .from('groups')
-        .select('*')
-        .eq('is_public', true)
-        .limit(10);
-
-      console.log('Public groups:', publicGroupsData, 'Error:', publicError);
-
-      if (publicError) {
-        console.error('Error loading public groups:', publicError);
-        setPublicGroups([]);
-      } else if (publicGroupsData) {
-        const publicWithCounts = await Promise.all(
-          publicGroupsData.map(async (group) => {
-            const { count } = await supabase
-              .from('group_members')
-              .select('*', { count: 'exact', head: true })
-              .eq('group_id', group.id)
-              .eq('status', 'active');
-
-            return {
-              ...group,
-              member_count: count || 0,
-            };
-          })
-        );
-
-        setPublicGroups(publicWithCounts.filter(g => !myGroups.find(mg => mg.id === g.id)));
-      } else {
-        setPublicGroups([]);
-      }
-    } catch (error) {
-      console.error('Error loading public groups:', error);
-      setPublicGroups([]);
     }
 
     setLoading(false);
   };
 
-  const joinGroup = async (groupId: string) => {
-    if (!user) return;
-
-    await supabase
-      .from('group_members')
-      .insert({
-        group_id: groupId,
-        user_id: user.id,
-        role: 'member',
-        status: 'active',
-      });
-
+  const handleJoinSuccess = () => {
     loadGroups();
   };
 
   if (loading || !user) {
     return (
       <View style={styles.loadingContainer}>
-        <ActivityIndicator size="large" color="#ff6b6b" />
+        <ActivityIndicator size="large" color="#2563EB" />
       </View>
     );
   }
@@ -158,38 +91,44 @@ export default function Groups() {
             <Text style={styles.title}>Community</Text>
             <Text style={styles.subtitle}>Connect & grow together</Text>
           </View>
-
           <TouchableOpacity
             style={styles.createButton}
             onPress={() => router.push('/groups/create' as any)}
           >
-            <Plus size={24} color="#ffffff" />
+            <Plus size={24} color="#fff" />
           </TouchableOpacity>
         </View>
       </LinearGradient>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        <View style={styles.inviteCard}>
-          <Text style={styles.inviteCardTitle}>Invite Friends to Join</Text>
-          <Text style={styles.inviteCardText}>
-            Invite your friends to grow in faith together and start weekly discussions!
-          </Text>
-          <FriendInviteButton />
-        </View>
+        {/* Join with Code - prominent */}
+        <TouchableOpacity style={styles.joinCard} onPress={() => setShowJoinModal(true)}>
+          <View style={styles.joinIcon}>
+            <Hash size={28} color="#2563EB" />
+          </View>
+          <View style={styles.joinContent}>
+            <Text style={styles.joinTitle}>Join with Code</Text>
+            <Text style={styles.joinText}>Have a join code? Enter it here to join a group</Text>
+          </View>
+          <ChevronRight size={22} color="#2563EB" />
+        </TouchableOpacity>
 
-        <View style={styles.debugBox}>
-          <Text style={styles.debugText}>🔍 Debug Info:</Text>
-          <Text style={styles.debugText}>User ID: {user?.id?.substring(0, 8) || 'Not logged in'}</Text>
-          <Text style={styles.debugText}>My Groups: {myGroups.length}</Text>
-          <Text style={styles.debugText}>Public Groups: {publicGroups.length}</Text>
-          <TouchableOpacity
-            style={styles.refreshButton}
-            onPress={loadGroups}
-          >
-            <Text style={styles.refreshButtonText}>Refresh Groups</Text>
-          </TouchableOpacity>
-        </View>
+        {/* Create Group CTA */}
+        <TouchableOpacity
+          style={styles.createCard}
+          onPress={() => router.push('/groups/create' as any)}
+        >
+          <View style={styles.createIcon}>
+            <Plus size={28} color="#fff" />
+          </View>
+          <View style={styles.createContent}>
+            <Text style={styles.createTitle}>Create Group</Text>
+            <Text style={styles.createText}>Start a new Bible study group</Text>
+          </View>
+          <ChevronRight size={22} color="#fff" />
+        </TouchableOpacity>
 
+        {/* My Groups */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>My Groups</Text>
 
@@ -198,371 +137,92 @@ export default function Groups() {
               <Users size={48} color="#d1d5db" />
               <Text style={styles.emptyTitle}>No groups yet</Text>
               <Text style={styles.emptyText}>
-                Join a public group or create your own!
+                Create a group or join one with a code
               </Text>
-              <Text style={[styles.emptyText, { marginTop: 10, fontSize: 12, color: '#f59e0b' }]}>
-                Check browser console (F12) for loading errors
-              </Text>
+              <TouchableOpacity
+                style={styles.emptyButton}
+                onPress={() => setShowJoinModal(true)}
+              >
+                <Hash size={18} color="#fff" />
+                <Text style={styles.emptyButtonText}>Join with Code</Text>
+              </TouchableOpacity>
             </View>
           ) : (
-            myGroups.map(group => (
+            myGroups.map((group) => (
               <TouchableOpacity
                 key={group.id}
                 style={styles.groupCard}
                 onPress={() => router.push(`/groups/${group.id}` as any)}
               >
-                <View style={styles.groupIconContainer}>
-                  <LinearGradient
-                    colors={['#ff6b6b', '#ee5a6f']}
-                    start={{ x: 0, y: 0 }}
-                    end={{ x: 1, y: 1 }}
-                    style={styles.groupIcon}
-                  >
-                    <Users size={24} color="#ffffff" />
+                <View style={styles.groupIcon}>
+                  <LinearGradient colors={['#2563EB', '#1E40AF']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={styles.groupIconGrad}>
+                    <Users size={24} color="#fff" />
                   </LinearGradient>
                 </View>
-
                 <View style={styles.groupInfo}>
                   <View style={styles.groupHeader}>
                     <Text style={styles.groupName}>{group.name}</Text>
-                    {group.role === 'leader' && (
-                      <View style={styles.leaderBadge}>
-                        <Text style={styles.leaderBadgeText}>LEADER</Text>
-                      </View>
+                    {(group.role === 'owner' || group.role === 'leader') && (
+                      <View style={styles.badge}><Text style={styles.badgeText}>LEADER</Text></View>
                     )}
                   </View>
-                  <Text style={styles.groupDescription} numberOfLines={2}>
-                    {group.description || 'No description'}
-                  </Text>
-                  <View style={styles.groupMeta}>
-                    <View style={styles.metaItem}>
-                      <Users size={14} color="#666" />
-                      <Text style={styles.metaText}>{group.member_count} members</Text>
-                    </View>
-                    <View style={styles.metaItem}>
-                      <MessageCircle size={14} color="#666" />
-                      <Text style={styles.metaText}>Week {group.current_week}</Text>
-                    </View>
+                  <Text style={styles.groupDesc} numberOfLines={2}>{group.description || 'Bible study group'}</Text>
+                  <View style={styles.meta}>
+                    <Users size={14} color="#666" />
+                    <Text style={styles.metaText}>{group.member_count} members · Week {group.current_week}</Text>
                   </View>
                 </View>
-
-                <View style={styles.groupActions}>
-                  {group.unread_count > 0 && (
-                    <View style={styles.unreadBadge}>
-                      <Text style={styles.unreadBadgeText}>{group.unread_count}</Text>
-                    </View>
-                  )}
-                  <ChevronRight size={20} color="#d1d5db" />
-                </View>
+                <ChevronRight size={20} color="#d1d5db" />
               </TouchableOpacity>
             ))
           )}
         </View>
-
-        {publicGroups.length > 0 && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Discover Groups</Text>
-
-            {publicGroups.map(group => (
-              <View key={group.id} style={styles.groupCard}>
-                <View style={styles.groupIconContainer}>
-                  <View style={styles.groupIconPublic}>
-                    <Users size={24} color="#ff6b6b" />
-                  </View>
-                </View>
-
-                <View style={styles.groupInfo}>
-                  <Text style={styles.groupName}>{group.name}</Text>
-                  <Text style={styles.groupDescription} numberOfLines={2}>
-                    {group.description || 'No description'}
-                  </Text>
-                  <View style={styles.groupMeta}>
-                    <View style={styles.metaItem}>
-                      <Users size={14} color="#666" />
-                      <Text style={styles.metaText}>{group.member_count} members</Text>
-                    </View>
-                  </View>
-                </View>
-
-                <TouchableOpacity
-                  style={styles.joinButton}
-                  onPress={() => joinGroup(group.id)}
-                >
-                  <Text style={styles.joinButtonText}>Join</Text>
-                </TouchableOpacity>
-              </View>
-            ))}
-          </View>
-        )}
-
-        <View style={styles.infoCard}>
-          <Text style={styles.infoTitle}>📖 Weekly Discussions</Text>
-          <Text style={styles.infoText}>
-            Each week, new discussion threads automatically appear in your groups based on the Bible reading plan.
-          </Text>
-        </View>
       </ScrollView>
+
+      <JoinGroupByCodeModal
+        visible={showJoinModal}
+        onClose={() => setShowJoinModal(false)}
+        onJoinSuccess={handleJoinSuccess}
+      />
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9FAFB',
-  },
-  loadingContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F9FAFB',
-  },
-  header: {
-    paddingTop: 60,
-    paddingHorizontal: 24,
-    paddingBottom: 32,
-    borderBottomLeftRadius: 32,
-    borderBottomRightRadius: 32,
-  },
-  headerContent: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '700',
-    color: '#ffffff',
-  },
-  subtitle: {
-    fontSize: 16,
-    color: 'rgba(255,255,255,0.9)',
-    marginTop: 4,
-  },
-  createButton: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  content: {
-    flex: 1,
-  },
-  inviteCard: {
-    backgroundColor: '#EFF6FF',
-    borderRadius: 16,
-    padding: 20,
-    margin: 16,
-    marginTop: 8,
-    borderWidth: 2,
-    borderColor: '#2563EB',
-  },
-  inviteCardTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 8,
-  },
-  inviteCardText: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 16,
-  },
-  section: {
-    padding: 16,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginBottom: 16,
-  },
-  emptyCard: {
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 40,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginTop: 16,
-  },
-  emptyText: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
-    marginTop: 8,
-    lineHeight: 20,
-  },
-  groupCard: {
-    flexDirection: 'row',
-    backgroundColor: '#FFFFFF',
-    borderRadius: 20,
-    padding: 16,
-    marginBottom: 12,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  groupIconContainer: {
-    marginRight: 16,
-  },
-  groupIcon: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  groupIconPublic: {
-    width: 56,
-    height: 56,
-    borderRadius: 28,
-    backgroundColor: '#ffe5e5',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  groupInfo: {
-    flex: 1,
-  },
-  groupHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 4,
-  },
-  groupName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#1a1a1a',
-    marginRight: 8,
-  },
-  leaderBadge: {
-    backgroundColor: '#fef3c7',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 8,
-  },
-  leaderBadgeText: {
-    fontSize: 10,
-    fontWeight: '700',
-    color: '#92400e',
-    letterSpacing: 0.5,
-  },
-  groupDescription: {
-    fontSize: 14,
-    color: '#666',
-    lineHeight: 20,
-    marginBottom: 8,
-  },
-  groupMeta: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  metaItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-  },
-  metaText: {
-    fontSize: 12,
-    color: '#666',
-    fontWeight: '600',
-  },
-  groupActions: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 8,
-  },
-  unreadBadge: {
-    backgroundColor: '#ef4444',
-    width: 24,
-    height: 24,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  unreadBadgeText: {
-    color: '#ffffff',
-    fontSize: 11,
-    fontWeight: '700',
-  },
-  joinButton: {
-    backgroundColor: '#ff6b6b',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 12,
-  },
-  joinButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '700',
-  },
-  infoCard: {
-    margin: 16,
-    padding: 20,
-    backgroundColor: '#ffe5e5',
-    borderRadius: 16,
-  },
-  infoTitle: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: '#c44569',
-    marginBottom: 8,
-  },
-  infoText: {
-    fontSize: 14,
-    color: '#ff6b6b',
-    lineHeight: 20,
-  },
-  signInButton: {
-    backgroundColor: '#ff6b6b',
-    paddingHorizontal: 32,
-    paddingVertical: 14,
-    borderRadius: 12,
-    marginTop: 20,
-  },
-  signInButtonText: {
-    color: '#ffffff',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  debugBox: {
-    backgroundColor: '#fef3c7',
-    padding: 16,
-    margin: 16,
-    borderRadius: 12,
-    borderWidth: 2,
-    borderColor: '#f59e0b',
-  },
-  debugText: {
-    fontSize: 14,
-    color: '#92400e',
-    marginBottom: 4,
-    fontFamily: 'monospace',
-  },
-  refreshButton: {
-    backgroundColor: '#f59e0b',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 12,
-    alignItems: 'center',
-  },
-  refreshButtonText: {
-    color: '#ffffff',
-    fontSize: 14,
-    fontWeight: '700',
-  },
+  container: { flex: 1, backgroundColor: '#F9FAFB' },
+  loadingContainer: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F9FAFB' },
+  header: { paddingTop: 60, paddingHorizontal: 24, paddingBottom: 32, borderBottomLeftRadius: 32, borderBottomRightRadius: 32 },
+  headerContent: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
+  title: { fontSize: 28, fontWeight: '700', color: '#fff' },
+  subtitle: { fontSize: 16, color: 'rgba(255,255,255,0.9)', marginTop: 4 },
+  createButton: { width: 48, height: 48, borderRadius: 24, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center' },
+  content: { flex: 1 },
+  joinCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#EFF6FF', borderRadius: 16, padding: 20, margin: 16, marginBottom: 8, borderWidth: 2, borderColor: '#BFDBFE' },
+  joinIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#DBEAFE', alignItems: 'center', justifyContent: 'center', marginRight: 16 },
+  joinContent: { flex: 1 },
+  joinTitle: { fontSize: 18, fontWeight: '700', color: '#1E40AF', marginBottom: 2 },
+  joinText: { fontSize: 14, color: '#3B82F6', lineHeight: 20 },
+  createCard: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#2563EB', borderRadius: 16, padding: 20, marginHorizontal: 16, marginBottom: 24, borderWidth: 2, borderColor: '#1D4ED8' },
+  createIcon: { width: 56, height: 56, borderRadius: 28, backgroundColor: 'rgba(255,255,255,0.2)', alignItems: 'center', justifyContent: 'center', marginRight: 16 },
+  createContent: { flex: 1 },
+  createTitle: { fontSize: 18, fontWeight: '700', color: '#fff', marginBottom: 2 },
+  createText: { fontSize: 14, color: 'rgba(255,255,255,0.9)', lineHeight: 20 },
+  section: { padding: 16 },
+  sectionTitle: { fontSize: 20, fontWeight: '700', color: '#1a1a1a', marginBottom: 16 },
+  emptyCard: { backgroundColor: '#fff', borderRadius: 20, padding: 40, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
+  emptyTitle: { fontSize: 18, fontWeight: '700', color: '#1a1a1a', marginTop: 16 },
+  emptyText: { fontSize: 14, color: '#666', textAlign: 'center', marginTop: 8 },
+  emptyButton: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#2563EB', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12, marginTop: 20 },
+  emptyButtonText: { color: '#fff', fontSize: 14, fontWeight: '700' },
+  groupCard: { flexDirection: 'row', backgroundColor: '#fff', borderRadius: 20, padding: 16, marginBottom: 12, alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.08, shadowRadius: 4, elevation: 2 },
+  groupIcon: { marginRight: 16 },
+  groupIconGrad: { width: 56, height: 56, borderRadius: 28, alignItems: 'center', justifyContent: 'center' },
+  groupInfo: { flex: 1 },
+  groupHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 4 },
+  groupName: { fontSize: 16, fontWeight: '700', color: '#1a1a1a', marginRight: 8 },
+  badge: { backgroundColor: '#fef3c7', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 8 },
+  badgeText: { fontSize: 10, fontWeight: '700', color: '#92400e', letterSpacing: 0.5 },
+  groupDesc: { fontSize: 14, color: '#666', lineHeight: 20, marginBottom: 8 },
+  meta: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  metaText: { fontSize: 12, color: '#666', fontWeight: '600' },
 });

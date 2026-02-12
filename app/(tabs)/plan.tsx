@@ -6,6 +6,7 @@ import { CheckCircle2, Circle, Flame, Book, Play, Pause, X, Volume2, Heart, Chev
 import { LinearGradient } from 'expo-linear-gradient';
 import * as Speech from 'expo-speech';
 import BibleReader from '@/components/BibleReader';
+import { toDisplayString } from '@/lib/displayUtils';
 
 type DailyReading = {
   id: string;
@@ -322,7 +323,7 @@ export default function Plan() {
 
                   {reading.scripture_references.length > 0 && (
                     <Text style={styles.dayReference} numberOfLines={1}>
-                      {reading.scripture_references[0]}
+                      {toDisplayString(reading.scripture_references[0])}
                     </Text>
                   )}
                 </LinearGradient>
@@ -373,17 +374,17 @@ export default function Plan() {
                 )}
               </View>
 
-              <Text style={styles.breakdownTitle}>{reading.title}</Text>
+              <Text style={styles.breakdownTitle}>{toDisplayString(reading.title)}</Text>
 
               <Text style={styles.breakdownRefs}>
-                📖 {reading.scripture_references.join(', ')}
+                📖 {reading.scripture_references.map(toDisplayString).join(', ')}
               </Text>
 
               {reading.topics && reading.topics.length > 0 && (
                 <View style={styles.breakdownTopics}>
                   {reading.topics.map((topic, idx) => (
                     <View key={idx} style={styles.breakdownTopicTag}>
-                      <Text style={styles.breakdownTopicText}>{topic}</Text>
+                      <Text style={styles.breakdownTopicText}>{toDisplayString(topic)}</Text>
                     </View>
                   ))}
                 </View>
@@ -394,7 +395,7 @@ export default function Plan() {
                   <Text style={styles.breakdownPointsLabel}>Key Points:</Text>
                   {reading.main_points.slice(0, 2).map((point, idx) => (
                     <Text key={idx} style={styles.breakdownPoint}>
-                      • {point}
+                      • {toDisplayString(point)}
                     </Text>
                   ))}
                   {reading.main_points.length > 2 && (
@@ -429,7 +430,7 @@ export default function Plan() {
                   <Text style={styles.modalDayLabel}>
                     {DAY_NAMES[(selectedDay.day_number - 1) % 7]} • Day {selectedDay.day_number}
                   </Text>
-                  <Text style={styles.modalTitle}>{selectedDay.title}</Text>
+                  <Text style={styles.modalTitle}>{toDisplayString(selectedDay.title)}</Text>
                 </View>
 
                 <TouchableOpacity
@@ -443,7 +444,7 @@ export default function Plan() {
               <View style={styles.referencesRow}>
                 {selectedDay.scripture_references.map((ref, idx) => (
                   <View key={idx} style={styles.refPill}>
-                    <Text style={styles.refPillText}>{ref}</Text>
+                    <Text style={styles.refPillText}>{toDisplayString(ref)}</Text>
                   </View>
                 ))}
               </View>
@@ -456,7 +457,7 @@ export default function Plan() {
                   <View style={styles.topicsContainer}>
                     {selectedDay.topics.map((topic, idx) => (
                       <View key={idx} style={styles.topicTag}>
-                        <Text style={styles.topicTagText}>{topic}</Text>
+                        <Text style={styles.topicTagText}>{toDisplayString(topic)}</Text>
                       </View>
                     ))}
                   </View>
@@ -466,7 +467,7 @@ export default function Plan() {
               {selectedDay.summary && (
                 <View style={styles.devotionalSection}>
                   <Text style={styles.sectionLabel}>📖 Today's Devotional</Text>
-                  <Text style={styles.devotionalText}>{selectedDay.summary}</Text>
+                  <Text style={styles.devotionalText}>{toDisplayString(selectedDay.summary)}</Text>
                 </View>
               )}
 
@@ -476,7 +477,7 @@ export default function Plan() {
                   {selectedDay.main_points.map((point, idx) => (
                     <View key={idx} style={styles.bulletPointRow}>
                       <Text style={styles.bulletDot}>•</Text>
-                      <Text style={styles.bulletPointText}>{point}</Text>
+                      <Text style={styles.bulletPointText}>{toDisplayString(point)}</Text>
                     </View>
                   ))}
                 </View>
@@ -527,14 +528,14 @@ export default function Plan() {
               {selectedDay.key_verse && (
                 <View style={styles.keyVerseCard}>
                   <Text style={styles.sectionLabel}>⭐ Key Verse</Text>
-                  <Text style={styles.keyVerseText}>{selectedDay.key_verse}</Text>
+                  <Text style={styles.keyVerseText}>{toDisplayString(selectedDay.key_verse)}</Text>
                 </View>
               )}
 
               {selectedDay.redemption_story && (
                 <View style={styles.redemptionCard}>
                   <Text style={styles.sectionLabel}>✨ Redemption Story</Text>
-                  <Text style={styles.redemptionText}>{selectedDay.redemption_story}</Text>
+                  <Text style={styles.redemptionText}>{toDisplayString(selectedDay.redemption_story)}</Text>
                 </View>
               )}
 
@@ -599,7 +600,7 @@ export default function Plan() {
               <Volume2 size={20} color="#FFF" />
               <View style={styles.miniPlayerInfo}>
                 <Text style={styles.miniPlayerTitle} numberOfLines={1}>
-                  {selectedDay.title}
+                  {toDisplayString(selectedDay.title)}
                 </Text>
                 <Text style={styles.miniPlayerSubtitle}>
                   {isPlaying ? 'Playing...' : 'Paused'}

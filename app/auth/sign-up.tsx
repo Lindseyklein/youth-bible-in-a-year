@@ -10,7 +10,7 @@ export default function SignUp() {
   const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
   const [displayName, setDisplayName] = useState('');
-  const [userRole, setUserRole] = useState<'youth_member' | 'youth_leader'>('youth_member');
+  const [userRole, setUserRole] = useState<'youth' | 'leader'>('youth');
   const [birthdate, setBirthdate] = useState('');
   const [parentEmail, setParentEmail] = useState('');
   const [showParentEmail, setShowParentEmail] = useState(false);
@@ -225,18 +225,18 @@ export default function SignUp() {
         <Text style={styles.roleLabel}>I am a:</Text>
         <View style={styles.roleOptions}>
           <TouchableOpacity
-            style={[styles.roleOption, userRole === 'youth_member' && styles.roleOptionSelected]}
-            onPress={() => setUserRole('youth_member')}
+            style={[styles.roleOption, userRole === 'youth' && styles.roleOptionSelected]}
+            onPress={() => setUserRole('youth')}
           >
-            <Text style={[styles.roleOptionText, userRole === 'youth_member' && styles.roleOptionTextSelected]}>
+            <Text style={[styles.roleOptionText, userRole === 'youth' && styles.roleOptionTextSelected]}>
               Youth Member
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.roleOption, userRole === 'youth_leader' && styles.roleOptionSelected]}
-            onPress={() => setUserRole('youth_leader')}
+            style={[styles.roleOption, userRole === 'leader' && styles.roleOptionSelected]}
+            onPress={() => setUserRole('leader')}
           >
-            <Text style={[styles.roleOptionText, userRole === 'youth_leader' && styles.roleOptionTextSelected]}>
+            <Text style={[styles.roleOptionText, userRole === 'leader' && styles.roleOptionTextSelected]}>
               Youth Leader
             </Text>
           </TouchableOpacity>

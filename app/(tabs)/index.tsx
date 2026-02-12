@@ -7,6 +7,7 @@ import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import WeeklyDiscussionModule from '@/components/WeeklyDiscussionModule';
 import { fetchBibleVerses } from '@/lib/bibleApi';
+import { toDisplayString } from '@/lib/displayUtils';
 
 type DailyReading = {
   id: string;
@@ -93,7 +94,7 @@ export default function Home() {
     // Load profile
     const { data: profileData } = await supabase
       .from('profiles')
-      .select('display_name, email, user_role')
+      .select('display_name, email, is_developer_admin')
       .eq('id', user.id)
       .maybeSingle();
 
@@ -102,7 +103,7 @@ export default function Home() {
       setFirstName(name);
     }
 
-    if (profileData?.user_role === 'admin') {
+    if (profileData?.is_developer_admin === true) {
       setIsAdmin(true);
     }
 
@@ -175,8 +176,8 @@ export default function Home() {
     if (weekData) {
       setCurrentWeek({
         number: weekNum,
-        title: weekData.title || `Week ${weekNum}`,
-        verse_text: weekData.theme || '',
+        title: toDisplayString(weekData.title) || `Week ${weekNum}`,
+        verse_text: toDisplayString(weekData.theme) || '',
         verse_reference: '',
       });
     } else {
@@ -309,7 +310,7 @@ export default function Home() {
             {firstName ? 'Ready to grow this week?' : "Let's grow together this week."}
           </Text>
           <Text style={styles.greetingSubtitle}>
-            You're on Week {currentWeek.number}: {currentWeek.title}
+            You're on Week {currentWeek.number}: {toDisplayString(currentWeek.title)}
           </Text>
           <Text style={styles.readyText}>Today's reading is ready.</Text>
         </View>
@@ -335,14 +336,14 @@ export default function Home() {
                 </View>
               ) : dailyVerseText ? (
                 <>
-                  <Text style={styles.dailyVerseText}>"{dailyVerseText}"</Text>
-                  <Text style={styles.dailyVerseReference}>— {todayReading.key_verse}</Text>
+                  <Text style={styles.dailyVerseText}>"{toDisplayString(dailyVerseText)}"</Text>
+                  <Text style={styles.dailyVerseReference}>— {toDisplayString(todayReading.key_verse)}</Text>
                   <TouchableOpacity
                     style={styles.dailyVerseShareButton}
                     onPress={async () => {
                       try {
                         await Share.share({
-                          message: `"${dailyVerseText}"\n\n— ${todayReading.key_verse}`,
+                          message: `"${toDisplayString(dailyVerseText)}"\n\n— ${toDisplayString(todayReading.key_verse)}`,
                         });
                       } catch (error) {
                         console.error('Error sharing:', error);
@@ -355,7 +356,7 @@ export default function Home() {
                 </>
               ) : (
                 <>
-                  <Text style={styles.dailyVerseReference}>{todayReading.key_verse}</Text>
+                  <Text style={styles.dailyVerseReference}>{toDisplayString(todayReading.key_verse)}</Text>
                   <Text style={styles.verseFallbackText}>
                     Read this verse in your Bible or tap on Today's Reading below
                   </Text>
@@ -380,11 +381,11 @@ export default function Home() {
             {todayReading?.scripture_references && todayReading.scripture_references.length > 0 ? (
               todayReading.scripture_references.map((passage, index) => (
                 <Text key={index} style={styles.passageText}>
-                  {passage}
+                  {toDisplayString(passage)}
                 </Text>
               ))
             ) : (
-              <Text style={styles.passageText}>{todayReading?.title || 'No reading available'}</Text>
+              <Text style={styles.passageText}>{toDisplayString(todayReading?.title) || 'No reading available'}</Text>
             )}
           </View>
 
@@ -411,12 +412,12 @@ export default function Home() {
           <View style={[styles.progressPill, styles.progressPillWide]}>
             <Award size={16} color="#56F0C3" />
             <Text style={styles.progressPillLabel}>Theme:</Text>
-            <Text style={styles.progressPillValueSmall}>{currentWeek.title}</Text>
+            <Text style={styles.progressPillValueSmall}>{toDisplayString(currentWeek.title)}</Text>
           </View>
         </View>
 
         {/* 5. Weekly Theme Banner */}
-        {currentWeek.verse_text && (
+        {toDisplayString(currentWeek.verse_text) && (
           <LinearGradient
             colors={['#0EA5E9', '#2563EB']}
             start={{ x: 0, y: 0 }}
@@ -424,10 +425,10 @@ export default function Home() {
             style={styles.themeBanner}
           >
             <Text style={styles.themeBannerLabel}>Week {currentWeek.number} Theme:</Text>
-            <Text style={styles.themeBannerTitle}>{currentWeek.title}</Text>
-            <Text style={styles.themeBannerVerse}>{currentWeek.verse_text}</Text>
-            {currentWeek.verse_reference && (
-              <Text style={styles.themeBannerReference}>— {currentWeek.verse_reference}</Text>
+            <Text style={styles.themeBannerTitle}>{toDisplayString(currentWeek.title)}</Text>
+            <Text style={styles.themeBannerVerse}>{toDisplayString(currentWeek.verse_text)}</Text>
+            {toDisplayString(currentWeek.verse_reference) && (
+              <Text style={styles.themeBannerReference}>— {toDisplayString(currentWeek.verse_reference)}</Text>
             )}
           </LinearGradient>
         )}
@@ -439,9 +440,9 @@ export default function Home() {
               <View style={styles.encouragementIcon}>
                 <Icon size={18} color="#2563EB" />
               </View>
-              <Text style={styles.encouragementTitle}>{weeklyEncouragement.title}</Text>
+              <Text style={styles.encouragementTitle}>{toDisplayString(weeklyEncouragement.title)}</Text>
             </View>
-            <Text style={styles.encouragementBody}>{weeklyEncouragement.body}</Text>
+            <Text style={styles.encouragementBody}>{toDisplayString(weeklyEncouragement.body)}</Text>
 
             {weeklyEncouragement.type === 'verse' && (
               <TouchableOpacity style={styles.shareButton} onPress={handleShare}>

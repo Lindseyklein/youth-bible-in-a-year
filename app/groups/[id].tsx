@@ -7,6 +7,7 @@ import { ArrowLeft, Settings, MessageCircle, BookOpen, Users, Heart, Target, Bel
 import { LinearGradient } from 'expo-linear-gradient';
 import DiscussionHistory from '@/components/DiscussionHistory';
 import GroupMembersList from '@/components/GroupMembersList';
+import { toDisplayString } from '@/lib/displayUtils';
 
 type Group = {
   id: string;
@@ -307,8 +308,8 @@ export default function GroupDetail() {
           )}
         </View>
 
-        <Text style={styles.groupName}>{group.name}</Text>
-        <Text style={styles.groupDescription}>{group.description}</Text>
+        <Text style={styles.groupName}>{toDisplayString(group.name)}</Text>
+        <Text style={styles.groupDescription}>{toDisplayString(group.description)}</Text>
 
         <View style={styles.groupMeta}>
           <View style={styles.metaItem}>
@@ -375,13 +376,13 @@ export default function GroupDetail() {
 
             {weeklyReading ? (
               <View style={styles.readingCard}>
-                <Text style={styles.readingTitle}>{weeklyReading.title}</Text>
+                <Text style={styles.readingTitle}>{toDisplayString(weeklyReading.title)}</Text>
 
                 <View style={styles.scriptureSection}>
                   <Text style={styles.scriptureLabel}>Scripture References</Text>
                   {weeklyReading.scripture_references.map((ref, index) => (
                     <Text key={index} style={styles.scriptureRef}>
-                      • {ref}
+                      • {toDisplayString(ref)}
                     </Text>
                   ))}
                 </View>
@@ -389,7 +390,7 @@ export default function GroupDetail() {
                 {weeklyReading.key_verse && (
                   <View style={styles.keyVerseSection}>
                     <Text style={styles.keyVerseLabel}>Key Verse</Text>
-                    <Text style={styles.keyVerseText}>{weeklyReading.key_verse}</Text>
+                    <Text style={styles.keyVerseText}>{toDisplayString(weeklyReading.key_verse)}</Text>
                   </View>
                 )}
 
@@ -410,7 +411,7 @@ export default function GroupDetail() {
             {discussion?.pinned_message && (
               <View style={styles.pinnedCard}>
                 <Text style={styles.pinnedLabel}>📌 Leader's Devotional</Text>
-                <Text style={styles.pinnedMessage}>{discussion.pinned_message}</Text>
+                <Text style={styles.pinnedMessage}>{toDisplayString(discussion.pinned_message)}</Text>
               </View>
             )}
           </View>
@@ -432,7 +433,7 @@ export default function GroupDetail() {
 
             {discussion ? (
               <View style={styles.discussionCard}>
-                <Text style={styles.discussionTitle}>{discussion.title}</Text>
+                <Text style={styles.discussionTitle}>{toDisplayString(discussion.title)}</Text>
                 <Text style={styles.discussionSubtitle}>
                   {discussion.post_count} {discussion.post_count === 1 ? 'post' : 'posts'}
                 </Text>
@@ -440,7 +441,7 @@ export default function GroupDetail() {
                 {discussion.pinned_message && (
                   <View style={styles.pinnedSection}>
                     <Text style={styles.pinnedLabel}>📌 Pinned by Leader</Text>
-                    <Text style={styles.pinnedText}>{discussion.pinned_message}</Text>
+                    <Text style={styles.pinnedText}>{toDisplayString(discussion.pinned_message)}</Text>
                   </View>
                 )}
 
@@ -480,8 +481,8 @@ export default function GroupDetail() {
               <View style={styles.broadcastCard}>
                 <Bell size={20} color="#92400e" />
                 <View style={styles.broadcastContent}>
-                  <Text style={styles.broadcastTitle}>📢 From {broadcasts[0].profiles.display_name}</Text>
-                  <Text style={styles.broadcastMessage}>{broadcasts[0].message}</Text>
+                  <Text style={styles.broadcastTitle}>📢 From {toDisplayString(broadcasts[0].profiles?.display_name)}</Text>
+                  <Text style={styles.broadcastMessage}>{toDisplayString(broadcasts[0].message)}</Text>
                 </View>
               </View>
             )}
@@ -496,7 +497,7 @@ export default function GroupDetail() {
                 <View key={request.id} style={styles.prayerCard}>
                   <View style={styles.prayerHeader}>
                     <View>
-                      <Text style={styles.prayerTitle}>{request.title}</Text>
+                      <Text style={styles.prayerTitle}>{toDisplayString(request.title)}</Text>
                       <Text style={styles.prayerAuthor}>by {request.profiles.display_name}</Text>
                     </View>
                     {request.visibility === 'leaders_only' && (
@@ -507,7 +508,7 @@ export default function GroupDetail() {
                   </View>
 
                   {request.description && (
-                    <Text style={styles.prayerDescription}>{request.description}</Text>
+                    <Text style={styles.prayerDescription}>{toDisplayString(request.description)}</Text>
                   )}
 
                   <TouchableOpacity
@@ -536,7 +537,7 @@ export default function GroupDetail() {
                 <View style={styles.challengeIcon}>
                   <Target size={24} color="#6366f1" />
                 </View>
-                <Text style={styles.challengeText}>{weeklyChallenge.challenge_text}</Text>
+                <Text style={styles.challengeText}>{toDisplayString(weeklyChallenge.challenge_text)}</Text>
                 <Text style={styles.challengeStats}>
                   {weeklyChallenge.completion_count} {weeklyChallenge.completion_count === 1 ? 'member' : 'members'} completed
                 </Text>

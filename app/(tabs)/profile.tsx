@@ -20,7 +20,9 @@ type Profile = {
   email: string | null;
   subscription_status: string;
   subscription_ends_at: string | null;
-  user_role: string;
+  user_role: 'adult' | 'leader' | 'youth' | null;
+  age_group: 'teen' | 'adult' | null;
+  is_developer_admin: boolean;
   reminder_enabled: boolean;
   reminder_time: string;
 };
@@ -313,7 +315,7 @@ export default function Profile() {
         <Text style={styles.displayName}>{profile?.display_name}</Text>
         <Text style={styles.username}>@{profile?.username}</Text>
         <View style={styles.roleTag}>
-          {profile?.user_role === 'youth_leader' ? (
+          {profile?.user_role === 'leader' ? (
             <>
               <Shield size={14} color="#2563EB" />
               <Text style={styles.roleText}>Youth Leader</Text>
@@ -324,7 +326,7 @@ export default function Profile() {
         </View>
       </View>
 
-      {profile?.user_role === 'youth_leader' && (
+      {profile?.user_role === 'leader' && (
         <View style={styles.inviteSection}>
           <TouchableOpacity
             style={styles.inviteButton}
@@ -343,7 +345,7 @@ export default function Profile() {
         </View>
       )}
 
-      {profile?.user_role === 'youth_leader' && (
+      {profile?.user_role === 'leader' && (
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
             <Text style={styles.sectionTitle}>Admin Tools</Text>

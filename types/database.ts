@@ -25,6 +25,9 @@ export interface Database {
           reminder_time: string;
           created_at: string;
           updated_at: string;
+          user_role: 'adult' | 'leader' | 'youth' | null;
+          age_group: 'teen' | 'adult' | null;
+          is_developer_admin: boolean;
         };
         Insert: {
           id: string;
@@ -41,6 +44,9 @@ export interface Database {
           reminder_time?: string;
           created_at?: string;
           updated_at?: string;
+          user_role?: 'adult' | 'leader' | 'youth' | null;
+          age_group?: 'teen' | 'adult' | null;
+          is_developer_admin?: boolean;
         };
         Update: {
           id?: string;
@@ -56,6 +62,9 @@ export interface Database {
           reminder_enabled?: boolean;
           reminder_time?: string;
           updated_at?: string;
+          user_role?: 'adult' | 'leader' | 'youth' | null;
+          age_group?: 'teen' | 'adult' | null;
+          is_developer_admin?: boolean;
         };
       };
       reading_plans: {
